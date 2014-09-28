@@ -9,7 +9,7 @@ library(sweidnumbr)
 
 ## ----example1, message=FALSE, eval=TRUE----------------------------------
 example_pin <- c("640823-3234", "6408233234", "19640823-3230")
-example_pin <- pin_format(example_pin)
+example_pin <- as.pin(example_pin)
 example_pin
 
 ## ----example2, message=FALSE, eval=TRUE----------------------------------
@@ -25,6 +25,13 @@ pin_birthplace(example_pin)
 ## ----example5, message=FALSE, eval=TRUE----------------------------------
 pin_age(example_pin)
 pin_age(example_pin, date = "2000-01-01")
+
+## ----example6, message=FALSE, eval=TRUE----------------------------------
+pin_age(example_pin, date = "2000-01-01", timespan = "months")
+pin_age(example_pin, date = "2000-01-01", timespan = "weeks")
+
+## ----example7, message=FALSE, eval=TRUE----------------------------------
+pin_to_date(example_pin)
 
 ## ----citation, message=FALSE, eval=TRUE----------------------------------
 citation("sweidnumbr")

@@ -5,21 +5,24 @@
 #' Converts one pin to standard format
 #' 
 #' @param pin A character element of length one.
+#' @param format Which format should be converted. See \link{as.pin}.
 #'  
 #' @return
 #' Character element on standard format.
+#' 
 #'
-pin_convert <- function(pin){
-  switch(as.character(nchar(pin)),
-         "13" = paste(as.character(substr(pin, 1, 8)), as.character(substr(pin, 10, 13)) ,sep=""),
-         "11" = paste(ifelse(substr(pin,start=7,7) == "-",
+
+pin_convert <- function(pin, format){
+  if(length(pin) == 0) return(pin)
+  switch(EXPR = format,
+         "1" = pin,
+         "2" = paste(as.character(substr(pin, 1, 8)), as.character(substr(pin, 10, 13)) ,sep=""),
+         "3" = paste(ifelse(substr(pin,start=7,7) == "-",
                              as.character(pin_century(pin)),
                              as.character(pin_century(pin)-1)), 
                       substr(pin, 1, 6),
                       substr(pin, 8, 11), sep=""),
-         "10" = paste(as.character(pin_century(pin)), pin ,sep=""),
-         "12" = pin,
-         as.character(NA))
+         "4" = paste(as.character(pin_century(pin)), pin ,sep=""))
 }
 
 #' @title
@@ -47,7 +50,7 @@ pin_century <- function(pin_short){
 #' @description
 #' Remove the change of day in coordination numbers (to enable age calculation).
 #' 
-#' @param pin Vector of pins at format atandard fromat 'YYYYMMDDNNNC'. See \link{pin_format}.
+#' @param pin Vector of pins at format atandard fromat 'YYYYMMDDNNNC'. See \link{as.pin}.
 #' 
 #' @return
 #' Character vector with pin, corrected for coordination numbers.
@@ -70,12 +73,13 @@ pin_coordn_correct <- function(pin){
 #' @description
 #' Internal computation of birthplace (one for each pin)
 #' 
-#' @param pin Character element with pin at standard format 'YYYYMMDDNNNC'. See \link{pin_format}.
+#' @param pin Character element with pin at standard format 'YYYYMMDDNNNC'. See \link{as.pin}.
 #' @param birth_vector Vector mapping birth number to birthplace. See \link{pin_birthplace}.
 #' 
 #' @return
 #' Character element containing birthplace
 pin_birthplace_internal <- function(pin, birth_vector){
+  if(is.na(pin)) return(pin)
   born <- as.numeric(substr(pin, 1, 4))
   if(born >= 1990){
     res <- "Born after 31 december 1989"

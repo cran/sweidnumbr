@@ -31,45 +31,73 @@
 #' @examples
 #' # Examples taken from SKV 704 (see references)
 #' ex_pin1 <- c("196408233234", "640823-3234", "19640823-3234")
-#' pin_format(ex_pin1)
+#' as.pin(pin = ex_pin1)
 #' ex_pin2 <- c("6408233234")
-#' pin_format(ex_pin2)
+#' as.pin(ex_pin2)
 #' ex_pin3 <- c(6408233234, 196408233234)
-#' pin_format(ex_pin3)
+#' as.pin(ex_pin3)
+#' ex_pin4 <-rep(c("20121209-0122", "201212090122", "121209-0122", "1212090122"),250)
+#' as.pin(ex_pin4)
+#' ex_pin5 <-c("205012090122", "186512090122", "121209-0122", "121209-012A")
+#' as.pin(pin = ex_pin5)
+#' pin <-c("201212090122", "201212090122", "121209-0122", "1212090122")
 #' 
 #' @export
-pin_format <- function(pin){
+as.pin <- function(pin){
   pin_is_char <- is.character(pin)
   pin <- as.character(pin)
   if(!pin_is_char){
     pin <- vapply(pin, pin_add_zero, character(1), USE.NAMES = FALSE)
   }
   
-  if(any(nchar(pin) == 10)) message("Assumption: All are less than 100 years old.")
-
-  # Convert
-  pin <- vapply(X = pin, FUN = pin_convert, FUN.VALUE = character(1), USE.NAMES = FALSE)
+  formats <- character(4)
+  # format 1: "YYYYMMDDNNNC"
+  formats[1] <- "^(18|19|20)[0-9]{2}(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{4}$"
+  # format 2: "YYYYMMDD-NNNC"
+  formats[2] <- "^(18|19|20)[0-9]{2}(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[-+][0-9]{4}$"
+  # format 3: "YYMMDD-NNNC"
+  formats[3] <- "^[0-9]{2}(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[-+][0-9]{4}$"
+  # format 4: "YYMMDDNNNC"
+  formats[4] <- "^[0-9]{2}(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{4}$"
   
-  ispin <- is.pin(pin = pin)
-  if(any(!ispin)) {
-    pin[!ispin] <- NA
+  # Convert
+  newpin <- rep(as.character(NA), length(pin))
+  logi_format <- rep(FALSE, length(pin))
+  for(i in 1:length(formats)){
+    logi_format <- grepl(formats[i], x = pin)
+    newpin[logi_format] <- pin_convert(pin[logi_format], format=i)
+    if(i == 4 & sum(logi_format, na.rm = TRUE) > 0) {
+      message("Assumption: \npin of format YYMMDDNNNC is assumed to be less than 100 years old.")}
+  }
+
+  # Add class
+  class(newpin) <- c("pin", "character")
+  
+  # Check dates
+  date <- as.Date(pin_coordn_correct(newpin),"%Y%m%d")
+  suppressWarnings( 
+    correct_date <-
+      !is.na(date) &
+      date <= Sys.Date() &
+      date >= as.Date("1830-01-01")
+  )
+  newpin[!correct_date] <- NA
+  
+  # Warning for incorrect pin
+  isna <- is.na(newpin)
+  if(any(isna)) {
     warning("The following personal identity numbers are incorrect: ", 
-            paste(which(!ispin), sep=", "), 
+            paste(which(isna), collapse = ", "), 
             call. = FALSE)
-  }  
-  return(pin)
+  }
+
+  return(newpin)
 }
 
-
 #' @title
-#' Test if a character vector contains correct  \code{pin}
+#' Test if a vector is of class \code{pin}
 #' 
-#' @description
-#' Test which elements of a character vector that contains correct personal 
-#' identity numbers (regarding format).
-#' To test the pin regarding the control number use \link{pin_ctrl}.
-#' 
-#' @param pin Character vector with swedish personal identity numbers with standard ABS format \code{"YYYYMMDDNNNC"}. See \link{pin_format}.
+#' @param pin A character vector to test if it is in \code{pin} format. See \link{as.pin}.
 #' 
 #' @return
 #' Logical vector indicating if the elements can are of format personal identity number.
@@ -80,14 +108,7 @@ pin_format <- function(pin){
 #'
 #' @export
 is.pin <- function(pin){
-  date <- as.Date(pin_coordn_correct(pin),"%Y%m%d")
-  suppressWarnings(
-  is.character(pin) &
-    !is.na(as.numeric(pin)) & 
-    nchar(pin) == 12 & 
-    !is.na(date) &
-    date <= Sys.Date()
-  )
+  "pin" %in% class(pin)
 }
 
 #' @title
@@ -97,7 +118,7 @@ is.pin <- function(pin){
 #' Calculates the control number using the Luhn algorithm and compare it with the 
 #' control number in the personal identity number.
 #' 
-#' @inheritParams is.pin
+#' @param pin A vector of class \code{pin}. See \link{as.pin}.
 #' 
 #' @references 
 #' \href{https://www.skatteverket.se/download/18.8dcbbe4142d38302d74be9/1387372677724/717B06.pdf}{Population registration in Sweden}
@@ -114,7 +135,7 @@ is.pin <- function(pin){
 #' 
 #' @export
 pin_ctrl <- function(pin){
-
+  if(!is.pin(pin)) pin <- as.pin(pin)
   res <- vapply(pin, luhn_algo, integer(1), USE.NAMES = FALSE, 
                 multiplier = c(0, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 0))
   as.integer(substr(pin, 12, 12)) == res
@@ -124,9 +145,9 @@ pin_ctrl <- function(pin){
 #' Calculate sex from \code{pin}
 #' 
 #' @description
-#' Calculates the sex of from the personal identification number.
+#' Calculates the sex from the personal identification number.
 #' 
-#' @inheritParams is.pin
+#' @inheritParams pin_ctrl
 #' 
 #' @references 
 #' \href{https://www.skatteverket.se/download/18.8dcbbe4142d38302d74be9/1387372677724/717B06.pdf}{Population registration in Sweden}
@@ -143,6 +164,7 @@ pin_ctrl <- function(pin){
 #'
 #' @export
 pin_sex <- function(pin){
+  if(!is.pin(pin)) pin <- as.pin(pin)
   female <- as.numeric(substr(pin,11,11)) %% 2 == 0
   output <- factor(ifelse(female, "Female", "Male"))
   return(output)
@@ -155,7 +177,7 @@ pin_sex <- function(pin){
 #' @description
 #' Calculate if the personal identity number is a coordination number.
 #' 
-#' @inheritParams is.pin
+#' @inheritParams pin_ctrl
 #' 
 #' @references 
 #' \href{https://www.skatteverket.se/download/18.8dcbbe4142d38302d74be9/1387372677724/717B06.pdf}{Population registration in Sweden}
@@ -172,6 +194,7 @@ pin_sex <- function(pin){
 #'
 #' @export
 pin_coordn <- function(pin) {
+  if(!is.pin(pin)) pin <- as.pin(pin)
   as.numeric(substr(pin,7,8)) > 60
 }
 
@@ -182,8 +205,15 @@ pin_coordn <- function(pin) {
 #' @description
 #' Calculate the age in full years for a given date.
 #' 
-#' @inheritParams is.pin
+#' @inheritParams pin_ctrl
 #' @param date Date at which age is calculated.
+#' @param timespan Timespan to use to calculate age. The actual timespans are:
+#' \itemize{
+#'   \item \code{years} (Default)
+#'   \item \code{months}
+#'   \item \code{weeks}
+#'   \item \code{days}
+#' }
 #'
 #' @references 
 #' \href{https://www.skatteverket.se/download/18.1e6d5f87115319ffba380001857/1285595720207/70408.pdf}{SKV 704}
@@ -203,15 +233,50 @@ pin_coordn <- function(pin) {
 #' pin_age(ex_pin, date = "2012-01-01")
 #'
 #' @export
-pin_age <- function(pin, date=Sys.Date()) {
+pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
   date <- as.Date(date)
-  pin <- pin_coordn_correct(pin)
-  diff <- lubridate::interval(lubridate::ymd(paste(substr(pin,1,4), 
-                             substr(pin,5,6), 
-                             substr(pin,7,8), sep="-")),
+  diff <- lubridate::interval(pin_to_date(pin),
                    lubridate::ymd(date))
-  message(paste("The age has been calculated at ", as.character(date), ".", sep=""))
-  return(as.integer(diff %/% lubridate::years(1)))
+  if(length(date) == 1){
+    message(paste("The age has been calculated at ", as.character(date), ".", sep=""))
+  } else {
+    warning("The age has been calculated for multiple dates.")
+  }
+
+  timespan_lubridate <-
+    switch(timespan,
+           "years" = lubridate::years(1),
+           "months" = lubridate::new_period(month=1),
+           "weeks" = lubridate::weeks(1),
+           "days" = lubridate::days(1))
+  
+  return(as.integer(diff %/% timespan_lubridate))
+}
+
+
+#' @title
+#' Calculate the date of birth from a \code{pin}
+#' 
+#' @description
+#' Calculates the date of birth in date format.
+#' 
+#' @inheritParams pin_ctrl
+#' 
+#' @return
+#' Date of birth as a vector in date format.
+#' 
+#' @examples
+#' # Examples taken from SKV 704 (see references)
+#' ex_pin <- c("196408233234", "186408833224")
+#' pin_to_date(ex_pin)
+#' 
+#' @export
+pin_to_date <- function(pin) {
+  if(!is.pin(pin)) pin <- as.pin(pin)
+  pin <- pin_coordn_correct(pin)
+  lubridate::ymd(paste(substr(pin,1,4), 
+                       substr(pin,5,6), 
+                       substr(pin,7,8), sep="-"))
 }
 
 
@@ -235,7 +300,7 @@ pin_age <- function(pin, date=Sys.Date()) {
 #' During the period 1946 - 1989 the pin also contains information on whether one has 
 #' immigrated to Sweden during the period.
 #' 
-#' @inheritParams is.pin
+#' @inheritParams pin_ctrl
 #' 
 #' @references
 #' \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}
@@ -253,7 +318,7 @@ pin_age <- function(pin, date=Sys.Date()) {
 #'
 #' @export
 pin_birthplace <- function(pin){
-  
+  if(!is.pin(pin)) pin <- as.pin(pin)
   birth_vector <- 
     c(rep("Stockholm stad",10),
       rep("Stockholms l\u00E4n", 4),
@@ -291,6 +356,5 @@ pin_birthplace <- function(pin){
                           USE.NAMES = FALSE))
   
   return(res)
-
 }
 

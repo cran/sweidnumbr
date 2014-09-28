@@ -2,16 +2,16 @@
 cat("pin_birthplace : ")
 
 today_pin <- paste(paste(unlist(strsplit(as.character(Sys.Date()),split = "-")), collapse = ""),"0000",sep="")
-pin_test <- c("000000009876", "000000009876","196408233234", "196408833234", today_pin, "196408830000")
+pin_test <- c("0000000019876", "187001019876","196408233234", "196408833234", today_pin, "196408830000")
 pin_test_res <-
-  c(rep("Extra number and immigrants (immigrated after 1946)", 2),
+  c(NA, "Extra number and immigrants (immigrated after 1946)",
     rep("Gotlands län", 2),
     "Born after 31 december 1989",
     "Stockholm stad")
 
 test_that(desc="birthplace",{
-  expect_equal(pin_birthplace(pin = pin_test), expected = as.factor(pin_test_res))
-  expect_is(pin_birthplace(pin = pin_test), "factor")
+  suppressWarnings(expect_equal(pin_birthplace(pin = pin_test), expected = as.factor(pin_test_res)))
+  suppressWarnings(expect_is(pin_birthplace(pin = pin_test), "factor"))
 })
 
 cat("\n")
