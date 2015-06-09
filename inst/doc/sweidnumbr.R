@@ -26,12 +26,19 @@ pin_birthplace(example_pin)
 pin_age(example_pin)
 pin_age(example_pin, date = "2000-01-01")
 
-## ----example6, message=FALSE, eval=TRUE----------------------------------
-pin_age(example_pin, date = "2000-01-01", timespan = "months")
-pin_age(example_pin, date = "2000-01-01", timespan = "weeks")
+## ----oin1, message=FALSE, eval=TRUE--------------------------------------
+example_oin <- c("556000-4615", "232100-0156", "802002-4280")
+example_oin <- as.oin(example_oin)
+example_oin
 
-## ----example7, message=FALSE, eval=TRUE----------------------------------
-pin_to_date(example_pin)
+## ----oin2, message=FALSE, eval=TRUE--------------------------------------
+is.oin(example_oin)
+
+## ----oin3, message=FALSE, eval=TRUE--------------------------------------
+oin_ctrl(example_oin)
+
+## ----oin4, message=FALSE, eval=TRUE--------------------------------------
+oin_group(example_oin)
 
 ## ----citation, message=FALSE, eval=TRUE----------------------------------
 citation("sweidnumbr")

@@ -1,5 +1,5 @@
 #' @export
-as.data.frame.pin <- function (x, ...) 
+as.data.frame.oin <- function (x, ...) 
 {
   nm <- deparse(substitute(x), width.cutoff = 500L)
   if (!"nm" %in% names(list(...))) 
@@ -8,20 +8,19 @@ as.data.frame.pin <- function (x, ...)
 }
 
 #' @export
-print.pin <- function (x,...) 
+print.oin <- function (x,...) 
 {
   print(as.character(x),...)
-  cat("Personal identity number(s)")
+  cat("Organizational identity number(s)")
 }
 
 #' @export
-`[.pin` <- create_s3_method("[")
+`[.oin` <- create_s3_method("[")
 #' @export
-rep.pin <- create_s3_method("rep")
+rep.oin <- create_s3_method("rep")
 
 #' @export
-`[<-.pin` <- function(x, ..., value){
-  value <- as.pin(value)
+`[<-.oin` <- function(x, ..., value){
+  value <- as.oin(value)
   NextMethod()
 }
-
