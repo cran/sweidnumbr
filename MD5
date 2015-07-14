@@ -1,5 +1,5 @@
-18bc43f939cf22abc37e6f15b3e44fb5 *DESCRIPTION
-b502cbc2626feb4ffbe81c428928cd7f *LICENSE
+516e7925ac8bae14ba0e1584bb389e1d *DESCRIPTION
+ef3934902d02237066a02df57253d500 *LICENSE
 6a5f5d9d98e1fe44221b170ec3dde099 *NAMESPACE
 348bc632536f32e74368faa715089d46 *R/create_s3_methods.R
 26503c201b605f76b682d6aa9b40e179 *R/data_documentation.R
@@ -11,8 +11,7 @@ d4b4db5eda94e794a17617ec6e53bf8b *R/oin_methods.R
 a1ebbd5fc88c19bc4c20168fb871ef96 *R/pin_internal.R
 0d5f5a1d3c99656f4345223313aa9db8 *R/pin_methods.R
 777b087f2e0c727f415da9698c74604b *R/sweidnumbr.R
-fb5d88b9cb12cdb7dcaff572598dc856 *README.md
-f8fd7ce010164764d038d9c2a5e9346b *build/vignette.rds
+b4e2962bced662cfc9f5dbe470e6e06f *build/vignette.rds
 3679a265a31545a0e3084a0b6ade8474 *data/fake_pins.rda
 95bf1b707044de284b76ee8ac35e630b *inst/CITATION
 6ac1d9116d3212ab1bb4540557c32a97 *inst/doc/sweidnumbr.R
