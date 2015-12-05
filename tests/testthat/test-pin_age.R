@@ -16,8 +16,7 @@ test_that(desc="Handle NA and interimn in pin_age",{
 })
 
 test_that(desc="age in years at leapyear",{
-#  skip("Test fails currently due to lubridate error/bug.") # Bug fixed with lubridate 1.4
-#  expect_equal(pin_age(pin = c("200002291234", "200002281234"), date = "2012-01-01"), expected = c(11, 11))
+  expect_equal(pin_age(pin = c("200002291234", "200002281234"), date = "2012-01-01"), expected = c(11, 11))
 })
 
 test_that(desc="age at leapyear",{
@@ -28,10 +27,16 @@ test_that(desc="age at leapyear",{
 })
 
 test_that(desc="age in years at leapyear",{
-  expect_error(pin_age(pin = c("200002281234", "200002281234"), date = c("2012-01-01", "2013-01-01")))
-  expect_message(pin_age(pin = c("200002281234", "200002281234"), date = c("2012-01-01")))  
+  expect_equal(suppressMessages(pin_age(pin = c("200002281234", "200002281234"), date = c("2012-01-01", "2013-01-01"))), 
+               expected = c(11, 12))
+  expect_message(pin_age(pin = c("200002281234", "200002291234"), date = c("2012-01-01")))  
 })
 
 test_that(desc="Negative ages",{
   expect_warning(pin_age(pin = c("200002281234", "200002281234"), date = c("2000-01-01")))
+})
+
+test_that("multiple dates", {
+  expect_error(pin_age(pin_test, c("2010-10-10", "2000-01-01"), "Multiple dates used."))
+  expect_error(pin_age(pin_test, c("2010-10-10", "2000-01-01", "2002-12-31", "2010-05-06"), "Multiple dates used."))
 })

@@ -13,7 +13,7 @@
 #'   \item numeric: \code{YYYYMMDDNNNC}
 #'   \item numeric: \code{YYMMDDNNNC} (assuming < 100 years of age)
 #'   \item character: \code{"YYYYMMDDNNNC"}
-#'   \item character: \code{"YYMMDD-NNNC"}
+#'   \item character: \code{"YYMMDD-NNNC"},  \code{"YYMMDD+NNNC"}
 #'   \item character: \code{"YYYYMMDD-NNNC"}
 #'   \item character: \code{"YYMMDDNNNC"} (assuming < 100 years of age)
 #' }
@@ -21,10 +21,13 @@
 #' @param pin Vector with swedish personal identity numbers in character or numeric format. See details.
 #' 
 #' @references 
-#' \href{https://www.skatteverket.se/download/18.8dcbbe4142d38302d74be9/1387372677724/717B06.pdf}{Population registration in Sweden}
-#' \href{https://www.skatteverket.se/download/18.1e6d5f87115319ffba380001857/1285595720207/70408.pdf}{SKV 704}
-#' \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}
-#' 
+#' \itemize{
+#'  \item \href{https://www.skatteverket.se/download/18.8dcbbe4142d38302d74be9/1387372677724/717B06.pdf}{Population registration in Sweden}
+#'  \item \href{https://www.skatteverket.se/download/18.1e6d5f87115319ffba380001857/1285595720207/70408.pdf}{SKV 704}
+#'  \item \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}
+#'  \item \emph{Personnummer: information fran Centrala folkbokforings- och uppbordsnamnden.} (1967). Stockholm
+#'  \item \emph{Den svenska folkbokforingens historia under tre sekel.} (1982). Solna: Riksskatteverket \href{http://www.skatteverket.se/privat/folkbokforing/omfolkbokforing/folkbokforingigaridag/densvenskafolkbokforingenshistoriaundertresekler.4.18e1b10334ebe8bc80004141.html}{URL}
+#' }
 #' @return
 #' Vector of class "pin" (with additional classes "AsIs" and character) with swedish personal identity numbers with standard ABS format \code{"YYYYMMDDNNNC"}.
 #'
@@ -84,11 +87,10 @@ as.pin.logical <- function(pin){
 
 #' @export
 as.pin.character <- function(pin){
- 
   all_pins <- pin
   pin <- all_pins[!is.na(all_pins)]
   
-  formats <- character(4)
+  formats <- character(8)
   # format 1: "YYYYMMDDNNNC"
   formats[1] <- "^(18|19|20)[0-9]{2}(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{4}$"
   # format 2: "YYYYMMDD-NNNC"
@@ -98,20 +100,44 @@ as.pin.character <- function(pin){
   # format 4: "YYMMDDNNNC"
   formats[4] <- "^[0-9]{2}(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{4}$"
   
+  #  Additional formats for old "pins" for people deceased 1947 - 1967 (i.e. ctrl numbr is missing/replaced with A,T or X)
+  # format 1: "YYYYMMDDNNNC"
+  formats[5] <- "^(18[0-9]{2}|19([0-5][0-9]|6[0-6]))(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{3}[ATX ]$"
+  # format 2: "YYYYMMDD-NNNC"
+  formats[6] <- "^(18[0-9]{2}|19([0-5][0-9]|6[0-6]))(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[-+][0-9]{3}[ATX ]$"
+  # format 3: "YYMMDD-NNNC"
+  formats[7] <- "^([0-5][0-9]|6[0-6])(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[-+][0-9]{3}[ATX ]$"
+  # format 4: "YYMMDDNNNC"
+  formats[8] <- "^([0-5][0-9]|6[0-6])(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{3}[ATX ]$"
+  
   # Convert
   newpin <- rep(as.character(NA), length(pin))
-  class(newpin) <- class(pin) <- c("pin", "character")
   
   logi_format <- logical(length(pin))
-  for(i in seq_along(formats)){
+  msg <- NA
+  for (i in seq_along(formats)){
     logi_format <- grepl(formats[i], x = pin)
-    newpin[logi_format] <- pin_convert(pin[logi_format], format=i)
-    if(i == 4 & sum(logi_format, na.rm = TRUE) > 0) {
-      message("Assumption: \npin of format YYMMDDNNNC is assumed to be less than 100 years old.")}
+    newpin[logi_format] <- pin_convert(pin[logi_format], format = i - (i %/% 5) * 4)
+    if (any(logi_format)) {
+      if (i %in% c(3:4, 7:8)) {
+        msg[1] <- "pin of format YYMMDDNNNC is assumed to be less than 100 years old"
+      } 
+      if (i %in% 5:8) {
+        msg[2] <- paste("people with birth year before 1967 and",
+                        "character 'A', 'T' or 'X' instead of control number",
+                        "assumed deceast before 1967.")
+      }
+    }
   }
-  
+  # Maximum one of each message is enough, messages are therefore stored and possibly 
+  # overwritten but not printed inside the loop
+  if (!isTRUE(is.na(msg))) {
+    msg <- paste(stats::na.omit(msg), collapse = " and ")
+    message(paste("Assumption:", paste(toupper(substring(msg, 1, 1)), substring(msg, 2), sep = "", collapse = " ")))
+    }
+
   # Check dates
-  date <- as.Date(pin_coordn_correct(newpin),"%Y%m%d")
+  date <- as.Date(pin_coordn_correct(structure(newpin, class = "pin")),"%Y%m%d")
   suppressWarnings( 
     correct_date <-
       !is.na(date) &
@@ -127,8 +153,8 @@ as.pin.character <- function(pin){
   }
 
   all_pins[!is.na(all_pins)] <- newpin    
-  class(all_pins) <- c("AsIs", "pin", "character")
-  return(all_pins)
+  class(all_pins) <- c("AsIs", "pin", "character") 
+  all_pins
 }
 
 #' @title
@@ -175,7 +201,8 @@ pin_ctrl <- function(pin){
   if(!is.pin(pin)) pin <- as.pin(pin)
   res <- vapply(pin, luhn_algo, integer(1), USE.NAMES = FALSE, 
                 multiplier = c(0, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 0))
-  as.integer(substr(pin, 12, 12)) == res
+  old_pin_format <- format(pin_to_date(pin), format = "%Y") <= "1967" & grepl("*[ATX]$", pin)
+  as.integer(substr(pin, 12, 12)) == res | old_pin_format
 }
 
 #' @title
@@ -243,7 +270,8 @@ pin_coordn <- function(pin) {
 #' Calculate the age in full years for a given date.
 #' 
 #' @inheritParams pin_ctrl
-#' @param date Date at which age is calculated.
+#' @param date Date at which age is calculated. If a vector is provided it must be
+#'  of the same length as the \code{pin} argument.
 #' @param timespan Timespan to use to calculate age. The actual timespans are:
 #' \itemize{
 #'   \item \code{years} (Default)
@@ -271,19 +299,30 @@ pin_coordn <- function(pin) {
 #'
 #' @export
 pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
+  if (length(date) == 1) {
+    message("The age has been calculated at ", as.character(date), 
+            ".")
+  } 
+  else if (length(date) == length(pin)){
+    message("The age is calculated relative to the '", deparse(substitute(date)), "' date")
+  }
+  else {
+    stop("Multiple dates used.")
+  }
+  
   date <- as.Date(date)
   if(!is.pin(pin)) pin <- as.pin(pin)
   
   all_pins <- pin
-  pin <- all_pins[!is.na(all_pins)]
+  if (length(date) > 1){
+    valid_diff <- !is.na(all_pins) & !is.na(date)
+  }else{
+    valid_diff <- !is.na(all_pins)
+  }
+  pin <- all_pins[valid_diff]
   
   diff <- lubridate::interval(pin_to_date(pin),
                    lubridate::ymd(date))
-  if(length(date) == 1){
-    message("The age has been calculated at ", as.character(date), ".")
-  } else {
-    stop("Multiple dates used.")
-  }
 
   timespan_lubridate <-
     switch(timespan,
@@ -296,7 +335,7 @@ pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
   if(any(age < 0)) warning("Negative age(es).")
   
   all_age <- rep(as.integer(NA), length(all_pins))
-  all_age[!is.na(all_pins)] <- age
+  all_age[valid_diff] <- age
   all_age
 }
 
