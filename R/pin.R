@@ -2,12 +2,14 @@
 #' Parse personal identity numbers to ABS format
 #' 
 #' @description
-#' Converts personal identity numbers of different formats to standard (ABS) pin format \code{YYYYMMDDNNNC} 
-#' where \code{YYYYMMDD} is the date of birth, \code{NNN} is the birth number and \code{C} is the
+#' \code{as.pin} Converts personal identity numbers of different formats to standard (ABS) 
+#' pin format \code{YYYYMMDDNNNC} where \code{YYYYMMDD} is the date of birth, \code{NNN} 
+#' is the birth number and \code{C} is the
 #' control number.
+#' \code{is.pin} checks wether an R object is of class "pin".
 #' 
 #' @details
-#' The function converts different formats of swedish personal identity numbers to
+#' \code{as.pin} converts different formats of swedish personal identity numbers to
 #' the standard ABS format. The formats that can be converted are:
 #' \itemize{
 #'   \item numeric: \code{YYYYMMDDNNNC}
@@ -17,19 +19,23 @@
 #'   \item character: \code{"YYYYMMDD-NNNC"}
 #'   \item character: \code{"YYMMDDNNNC"} (assuming < 100 years of age)
 #' }
+#' (where "C" can be substituted by characters "A", "T" or "X" if "YYYY" < 1967).
 #' 
-#' @param pin Vector with swedish personal identity numbers in character or numeric format. See details.
+#' @param pin Vector with swedish personal identity numbers in character or numeric format. 
+#' See details.
 #' 
 #' @references 
 #' \itemize{
 #'  \item \href{https://www.skatteverket.se/download/18.8dcbbe4142d38302d74be9/1387372677724/717B06.pdf}{Population registration in Sweden}
 #'  \item \href{https://www.skatteverket.se/download/18.1e6d5f87115319ffba380001857/1285595720207/70408.pdf}{SKV 704}
 #'  \item \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}
-#'  \item \emph{Personnummer: information fran Centrala folkbokforings- och uppbordsnamnden.} (1967). Stockholm
-#'  \item \emph{Den svenska folkbokforingens historia under tre sekel.} (1982). Solna: Riksskatteverket \href{http://www.skatteverket.se/privat/folkbokforing/omfolkbokforing/folkbokforingigaridag/densvenskafolkbokforingenshistoriaundertresekler.4.18e1b10334ebe8bc80004141.html}{URL}
+#'  \item \emph{Personnummer: information fran Centrala folkbokförings- och uppbördsnämnden.} (1967). Stockholm
+#'  \item \emph{Den svenska folkbokföringens historia under tre sekel.} (1982). Solna: Riksskatteverket \href{http://www.skatteverket.se/privat/folkbokforing/omfolkbokforing/folkbokforingigaridag/densvenskafolkbokforingenshistoriaundertresekler.4.18e1b10334ebe8bc80004141.html}{URL}
 #' }
 #' @return
-#' Vector of class "pin" (with additional classes "AsIs" and character) with swedish personal identity numbers with standard ABS format \code{"YYYYMMDDNNNC"}.
+#' \code{as.pin} returns a vector of class "pin" (with additional classes "AsIs" and character) 
+#' with swedish personal identity numbers with standard ABS format \code{"YYYYMMDDNNNC"}.
+#' \code{is.pin} returns \code{TRUE} if \code{pin} is of class "pin", otherwise \code{FALSE}.
 #'
 #' @examples
 #' # Examples taken from SKV 704 (see references)
@@ -46,6 +52,7 @@
 #' pin <-c("201212090122", "201212090122", "121209-0122", "1212090122")
 #' 
 #' @export
+#' @name as.pin
 as.pin <- function(pin){
   UseMethod("as.pin")
 }
@@ -101,13 +108,13 @@ as.pin.character <- function(pin){
   formats[4] <- "^[0-9]{2}(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{4}$"
   
   #  Additional formats for old "pins" for people deceased 1947 - 1967 (i.e. ctrl numbr is missing/replaced with A,T or X)
-  # format 1: "YYYYMMDDNNNC"
+  # format 5: "YYYYMMDDNNNC"
   formats[5] <- "^(18[0-9]{2}|19([0-5][0-9]|6[0-6]))(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{3}[ATX ]$"
-  # format 2: "YYYYMMDD-NNNC"
+  # format 6: "YYYYMMDD-NNNC"
   formats[6] <- "^(18[0-9]{2}|19([0-5][0-9]|6[0-6]))(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[-+][0-9]{3}[ATX ]$"
-  # format 3: "YYMMDD-NNNC"
+  # format 7: "YYMMDD-NNNC"
   formats[7] <- "^([0-5][0-9]|6[0-6])(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[-+][0-9]{3}[ATX ]$"
-  # format 4: "YYMMDDNNNC"
+  # format 8: "YYMMDDNNNC"
   formats[8] <- "^([0-5][0-9]|6[0-6])(0[1-9]|1[0-2])([06][1-9]|[1278][0-9]|[39][0-1])[0-9]{3}[ATX ]$"
   
   # Convert
@@ -157,22 +164,9 @@ as.pin.character <- function(pin){
   all_pins
 }
 
-#' @title
-#' Test if a vector is of class \code{pin}
-#' 
-#' @param pin A character vector to test if it is in \code{pin} format. See \link{as.pin}.
-#' 
-#' @return
-#' Logical vector indicating if the elements can are of format personal identity number.
-#'
-#' @examples
-#' ex_pin <- c("196408233234", "AA6408323234")
-#' is.pin(ex_pin)
-#'
+#' @rdname as.pin
 #' @export
-is.pin <- function(pin){
-  "pin" %in% class(pin)
-}
+is.pin <- function(pin) inherits(pin, "pin")
 
 #' @title
 #' Check control number from \code{pin}

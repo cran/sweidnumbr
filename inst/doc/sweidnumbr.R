@@ -27,8 +27,8 @@ pin_age(example_pin)
 pin_age(example_pin, date = "2000-01-01")
 
 ## ----example6, message=FALSE, eval=TRUE----------------------------------
-format(example_pin, "%Y-%m-%d-%N")
-format(example_pin, "%P")
+format_pin(example_pin, "%Y-%m-%d-%N")
+format_pin(example_pin, "%P")
 
 ## ----oin1, message=FALSE, eval=TRUE--------------------------------------
 example_oin <- c("556000-4615", "232100-0156", "802002-4280")

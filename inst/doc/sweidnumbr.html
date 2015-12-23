@@ -204,6 +204,7 @@ hr {
 <!--
 %\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{sweidnumbr}
+\usepackage[utf8]{inputenc}
 -->
 
 <h1>sweidnumbr : Structural handling of swedish identity numbers</h1>
@@ -242,7 +243,7 @@ identity numbers (personnummer) and organizational identity numbers (organisatio
 
 <h2><a name="examplepin"></a>Example: personal identity numbers</h2>
 
-<p>As a first step we need to convert personal identity numbers (pin) to the sam standard ABS format.</p>
+<p>As a first step we need to convert personal identity numbers (pin) to the same standard format used by the Swedish tax authority.</p>
 
 <pre><code class="r">example_pin &lt;- c(&quot;640823-3234&quot;, &quot;6408233234&quot;, &quot;19640823-3230&quot;)
 example_pin &lt;- as.pin(example_pin)
@@ -253,7 +254,7 @@ example_pin
 ## Personal identity number(s)
 </code></pre>
 
-<p>The next step is to test if the format is correct. To do this we use the <code>is.pin()</code> function.</p>
+<p>The next step is to test if the vector is a <code>pin</code> object. To do this we use the <code>is.pin()</code> function.</p>
 
 <pre><code class="r">is.pin(example_pin)
 </code></pre>
@@ -299,15 +300,15 @@ example_pin
 <pre><code>## [1] 35 35 35
 </code></pre>
 
-<p>It is also possible to format the pin for presentation in different forms. (Note however that the output of <code>format</code> is just a character and no longer a pin):</p>
+<p>It is also possible to format the pin for presentation in different forms. (Note however that the output of <code>format_pin</code> is just a character and no longer a <code>pin</code> object):</p>
 
-<pre><code class="r">format(example_pin, &quot;%Y-%m-%d-%N&quot;)
+<pre><code class="r">format_pin(example_pin, &quot;%Y-%m-%d-%N&quot;)
 </code></pre>
 
 <pre><code>## [1] &quot;1964-08-23-3234&quot; &quot;1964-08-23-3234&quot; &quot;1964-08-23-3230&quot;
 </code></pre>
 
-<pre><code class="r">format(example_pin, &quot;%P&quot;)
+<pre><code class="r">format_pin(example_pin, &quot;%P&quot;)
 </code></pre>
 
 <pre><code>## [1] &quot;(19) 64-08-23 - 3234&quot; &quot;(19) 64-08-23 - 3234&quot; &quot;(19) 64-08-23 - 3230&quot;
@@ -334,7 +335,7 @@ example_oin
 <pre><code>## [1] TRUE
 </code></pre>
 
-<p>With a vector of <code>oin</code> we can check if the control number is correct.</p>
+<p>With a vector of <code>oin</code> we can check if the organizational number is correct.</p>
 
 <pre><code class="r">oin_ctrl(example_oin)
 </code></pre>
@@ -365,16 +366,17 @@ example_oin
 <pre><code>## 
 ## Kindly cite the sweidnumbr R package as follows:
 ## 
-##   (C) Mans Magnusson(2014).  sweidnumbr: R tools to handle of
-##   swedish identity numbers. URL:
+##   Magnusson, Mans and Bulow, Erik (2015). sweidnumbr: R tools to
+##   handle of swedish identity numbers. URL:
 ##   http://github.com/rOpenGov/sweidnumbr
 ## 
 ## A BibTeX entry for LaTeX users is
 ## 
 ##   @Misc{,
 ##     title = {sweidnumbr: R tools to handle of swedish identity numbers.},
-##     author = {Mans Magnusson},
-##     year = {2014},
+##     author = {Mans Magnusson and Erik Bulow},
+##     url = {http://github.com/rOpenGov/sweidnumbr},
+##     year = {2015},
 ##   }
 </code></pre>
 
@@ -385,6 +387,8 @@ example_oin
 <li><a href="https://www.skatteverket.se/download/18.1e6d5f87115319ffba380001857/1285595720207/70408.pdf">SKV 704 : Personnummer</a></li>
 <li><a href="http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/">SOU 2008:60 : Personnummer och samordningsnummer</a></li>
 <li><a href="https://www.skatteverket.se/foretagorganisationer/myndigheter/aviseringavbefolkningsuppgifternavet/skyddadepersonuppgifter.4.18e1b10334ebe8bc80001399.html">Protected personal identity numbers</a></li>
+<li>Personnummer: information fran Centrala folkbokförings- och uppbördsnämnden. (1967). Stockholm</li>
+<li>Den svenska folkbokföringens historia under tre sekel. (1982). Solna: Riksskatteverket <a href="http://www.skatteverket.se/privat/folkbokforing/omfolkbokforing/folkbokforingigaridag/densvenskafolkbokforingenshistoriaundertresekler.4.18e1b10334ebe8bc80004141.html">URL</a></li>
 <li><a href="http://www.skatteverket.se/download/18.70ac421612e2a997f85800040284/1359707510840/70909.pdf">SKV 709 : Organisationsnummer</a></li>
 </ul>
 
@@ -397,7 +401,7 @@ example_oin
 
 <pre><code>## R version 3.2.2 (2015-08-14)
 ## Platform: x86_64-apple-darwin13.4.0 (64-bit)
-## Running under: OS X 10.11.1 (El Capitan)
+## Running under: OS X 10.10.5 (Yosemite)
 ## 
 ## locale:
 ## [1] sv_SE.UTF-8/sv_SE.UTF-8/sv_SE.UTF-8/C/sv_SE.UTF-8/sv_SE.UTF-8
@@ -406,13 +410,12 @@ example_oin
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] sweidnumbr_0.7.3 devtools_1.9.1  
+## [1] roxygen2_5.0.1   sweidnumbr_0.8.4
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] magrittr_1.5         formatR_1.2.1        tools_3.2.2         
-##  [4] crayon_1.3.1         memoise_0.2.1        lubridate_1.4.0.9500
-##  [7] stringi_1.0-1        knitr_1.11           stringr_1.0.0       
-## [10] digest_0.6.8         testthat_0.11.0      evaluate_0.8
+##  [1] magrittr_1.5    formatR_1.2.1   tools_3.2.2     memoise_0.2.1  
+##  [5] Rcpp_0.12.1     lubridate_1.5.0 stringi_1.0-1   knitr_1.10.5   
+##  [9] digest_0.6.8    stringr_1.0.0   devtools_1.9.1  evaluate_0.8
 </code></pre>
 
 </body>
