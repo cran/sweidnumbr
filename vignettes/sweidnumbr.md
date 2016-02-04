@@ -212,21 +212,25 @@ citation("sweidnumbr")
 
 ```
 ## 
-## Kindly cite the sweidnumbr R package as follows:
+## To cite package 'sweidnumbr' in publications use:
 ## 
-##   Magnusson, Mans and Bulow, Erik (2015). sweidnumbr: R tools to
-##   handle of swedish identity numbers. R package version 1.0.0 URL:
-##   http://github.com/rOpenGov/sweidnumbr
+##   Mans Magnusson and Erik Bulow (2015). sweidnumbr: Handling of
+##   Swedish Identity Numbers. R package version 0.8.4.
+##   https://github.com/rOpenGov/sweidnumbr/
 ## 
 ## A BibTeX entry for LaTeX users is
 ## 
-##   @Misc{,
-##     title = {sweidnumbr: R tools to handle of swedish identity numbers.},
+##   @Manual{,
+##     title = {sweidnumbr: Handling of Swedish Identity Numbers},
 ##     author = {Mans Magnusson and Erik Bulow},
-##     url = {http://github.com/rOpenGov/sweidnumbr},
 ##     year = {2015},
-##     note = {R package version 1.0.0},
+##     note = {R package version 0.8.4},
+##     url = {https://github.com/rOpenGov/sweidnumbr/},
 ##   }
+## 
+## ATTENTION: This citation information has been auto-generated from
+## the package DESCRIPTION file and may need manual editing, see
+## 'help("citation")'.
 ```
 
 
@@ -251,7 +255,7 @@ sessionInfo()
 ```
 
 ```
-## R version 3.2.3 (2015-12-10)
+## R version 3.2.2 (2015-08-14)
 ## Platform: x86_64-apple-darwin13.4.0 (64-bit)
 ## Running under: OS X 10.10.5 (Yosemite)
 ## 
@@ -262,9 +266,11 @@ sessionInfo()
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] sweidnumbr_1.0.0
+## [1] sweidnumbr_0.8.4
 ## 
 ## loaded via a namespace (and not attached):
-## [1] magrittr_1.5    formatR_1.2.1   tools_3.2.3     lubridate_1.5.0
-## [5] stringi_1.0-1   knitr_1.10.5    stringr_1.0.0   evaluate_0.8
+##  [1] magrittr_1.5    formatR_1.2.1   tools_3.2.2     roxygen2_5.0.1 
+##  [5] Rcpp_0.12.1     memoise_0.2.1   lubridate_1.5.0 stringi_1.0-1  
+##  [9] knitr_1.10.5    stringr_1.0.0   digest_0.6.8    devtools_1.9.1 
+## [13] evaluate_0.8
 ```
