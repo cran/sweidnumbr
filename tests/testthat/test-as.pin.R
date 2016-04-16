@@ -63,8 +63,8 @@ test_that(desc="error expected",{
   expect_warning(as.pin("196418233234"))
   expect_warning(as.pin("196408333234"))
   
-  test_pin <- c("196408233234", tomorrow_pin, "AA6408323234", "19640823323", "1964083332349", "196408333234", "19640823-334")
-  test_pin_res <- c(TRUE, rep(FALSE, 6))
+  test_pin <- c("196408233234", tomorrow_pin, "AA6408323234", "19640823323", "1964083332349", "196408333234", "19640823-334", "19640823")
+  test_pin_res <- c(TRUE, rep(FALSE, 7))
   suppressWarnings(expect_equal(!is.na(as.pin(test_pin)), test_pin_res))
   
   non_relevant_class <- lm(1:10~rep(1:5,2))
@@ -74,7 +74,7 @@ test_that(desc="error expected",{
 
 
 test_that("as.pin.pin", {
-  expect_equal(as.pin(as.pin("test_pin")), as.pin("test_pin"))
+  suppressWarnings(expect_equal(as.pin(as.pin("test_pin")), as.pin("test_pin")))
 })
 
 test_that("as.pin.logical", {
@@ -105,5 +105,5 @@ test_that("deceased 1947 - 1967", {
 
 test_that("Expect message only when YYMMDDNNNC format is used", {
   num_to_check <- c("202100-6255","121212-1212","19121212-1212","121212+1212", 121212121212, NA, Inf, TRUE, F, "foo", 123, 456L)
-  expect_that(as.pin(num_to_check), not(shows_message()))
+  expect_silent(suppressWarnings(as.pin(num_to_check)))
 })

@@ -11,7 +11,7 @@ test_that(desc="character: GNNNNNN-NNNC",{
 })
 
 test_that(desc="error expected",{
-  expect_equal(as.character(suppressWarnings(as.oin(c("8020024280", "AA2002-4280")))), as.character(c(NA,NA)))  
+  expect_equal(as.character(suppressWarnings(as.oin(c("8020024280", "AA2002-4280","5560.0-4.15")))), as.character(c(NA,NA,NA)))  
 })
 
 
@@ -27,5 +27,10 @@ test_that("Recycling rules", {
 test_that("Same error messages as in as.pin() is used", {
   num_to_check <- c("202100-6255","121212-1212","19121212-1212","121212+1212", 1212121212, NA, Inf, TRUE, F, "foo", 123, 456L)
   expect_warning(as.oin(num_to_check), "Erroneous oin\\(s\\) \\(set to NA\\)\\.")
+})
+
+test_that("as.oin classes", {
+  to_check <- factor(c("556000-4615"))
+  expect_silent(as.oin(to_check))
 })
 

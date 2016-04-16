@@ -23,15 +23,17 @@
 #' as.oin(ex_oin)
 #' 
 #' @export
-#' 
 as.oin <- function(oin){
+  UseMethod("as.oin")
+}
+
+#' @export
+as.oin.character <- function(oin){
   suppressWarnings(
     correct <- 
       is.character(oin) &
-        !is.na(as.numeric(substr(oin,1,6))) & 
-        grepl(pattern = "-", substr(oin,7,7)) &
-        !is.na(as.numeric(substr(oin,8,11))) &
-        as.numeric(substr(oin,3,3)) >= 2
+        grepl(pattern = "^[0-9]{6}-[0-9]{4}$", oin) &
+        as.numeric(substr(oin,3,3)) >= 2 
   )
   newoin <- oin
   newoin[!correct] <- NA
@@ -46,6 +48,23 @@ as.oin <- function(oin){
   class(newoin) <- c("AsIs", "oin", "character")
   
   return(newoin)
+}
+
+#' @export
+as.oin.oin <- function(oin){
+  oin
+}
+
+#' @export
+as.oin.factor <- function(oin){
+  as.oin(as.character(oin))
+}
+
+#' @export
+as.oin.default <- function(oin){
+  stop("Object of class ", paste(class(oin), collapse = ", "), 
+       " can not be coerced to oin!"
+  )
 }
 
 
