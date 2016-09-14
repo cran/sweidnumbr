@@ -1,8 +1,8 @@
 Package: sweidnumbr
 Type: Package
 Title: Handling of Swedish Identity Numbers
-Version: 1.2.0
-Date: 2016-04-15
+Version: 1.4.1
+Date: 2016-08-29
 Author: Mans Magnusson and Erik Bulow
 Maintainer: Mans Magnusson <mons.magnusson@gmail.com>
 Description: Structural handling of identity numbers used in the Swedish
@@ -19,6 +19,6 @@ Suggests: testthat (>= 1.0.0), rmarkdown, knitr
 LazyData: true
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-04-15 19:11:31 UTC; manma97
+Packaged: 2016-09-14 14:56:11 UTC; manma97
 Repository: CRAN
-Date/Publication: 2016-04-16 04:50:43
+Date/Publication: 2016-09-14 19:44:25

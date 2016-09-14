@@ -1,4 +1,4 @@
-#' @title
+#' @title 
 #' Parse organizational identity numbers
 #'
 #' @description
@@ -13,7 +13,7 @@
 #' @param oin Vector with swedish organizational identity numbers in character format. See details.
 #' 
 #' @references 
-#' \href{http://www.skatteverket.se/download/18.70ac421612e2a997f85800040284/1359707510840/70909.pdf}{SKV 709}
+#' \href{http://www.riksdagen.se/sv/dokument-lagar/dokument/svensk-forfattningssamling/lag-1974174-om-identitetsbeteckning-for_sfs-1974-174}{Lag (1974:174) om identitetsbeteckning for juridiska personer m.fl.}
 #' 
 #' @return
 #' Character vector (of class \code{oin} and \code{AsIs}) with swedish organizational identity numbers.
@@ -29,16 +29,21 @@ as.oin <- function(oin){
 
 #' @export
 as.oin.character <- function(oin){
-  suppressWarnings(
-    correct <- 
-      is.character(oin) &
-        grepl(pattern = "^[0-9]{6}-[0-9]{4}$", oin) &
-        as.numeric(substr(oin,3,3)) >= 2 
-  )
-  newoin <- oin
-  newoin[!correct] <- NA
+  formats <- character(2)
+  # format 1: "NNNNNN-NNNC"
+  formats[1] <- "^[0-9]{2}[2-9]{1}[0-9]{3}-[0-9]{4}$"
+  # format 2: "NNNNNNNNNC"
+  formats[2] <- "^[0-9]{2}[2-9]{1}[0-9]{3}[0-9]{4}$"
+
+  newoin <- rep(as.character(NA), length(oin))
   
-  # Warning for incorrect pin
+  logi_format <- logical(length(oin))
+  for (i in seq_along(formats)){ # i <- 1
+    logi_format <- grepl(formats[i], x = oin)
+    newoin[logi_format] <- oin_convert(oin[logi_format], format = i)
+  }
+
+  # Warning for incorrect oin
   isna <- is.na(newoin)
   if(any(isna)) {
     warning("Erroneous oin(s) (set to NA).")
@@ -50,6 +55,14 @@ as.oin.character <- function(oin){
   return(newoin)
 }
 
+oin_convert <- function(oin, format){
+  if(format==1){
+    return(oin)
+  } else if(format==2){
+    return(paste0(substr(oin, 1, 6), "-", substr(oin, 7, 10)))
+  }
+}
+
 #' @export
 as.oin.oin <- function(oin){
   oin
@@ -57,6 +70,11 @@ as.oin.oin <- function(oin){
 
 #' @export
 as.oin.factor <- function(oin){
+  as.oin(as.character(oin))
+}
+
+#' @export
+as.oin.numeric <- function(oin){
   as.oin(as.character(oin))
 }
 
@@ -100,7 +118,7 @@ is.oin <- function(oin){
 #' @param force_logical If TRUE, force all NA in oin to be FALSE. Default is FALSE.
 #' 
 #' @references 
-#' \href{http://www.skatteverket.se/download/18.70ac421612e2a997f85800040284/1302507382017/70909.pdf}{SKV 709}
+#' \href{http://www.skatteverket.se/foretagochorganisationer/foretagare/startaochregistrera/organisationsnummer.4.361dc8c15312eff6fd235d1.html?q=organisationsnummer}{Organisationsnummer Skatteverket}
 #' 
 #' @return
 #' Logical vector indicating if a oin is correct (\code{TRUE}) or not (\code{FALSE})
@@ -137,7 +155,7 @@ oin_ctrl <- function(oin, force_logical = FALSE){
 #' @inheritParams oin_ctrl
 #' 
 #' @references 
-#' \href{http://www.skatteverket.se/download/18.70ac421612e2a997f85800040284/1302507382017/70909.pdf}{SKV 709}
+#' \href{http://www.skatteverket.se/foretagochorganisationer/foretagare/startaochregistrera/organisationsnummer.4.361dc8c15312eff6fd235d1.html?q=organisationsnummer}{Organisationsnummer Skatteverket}
 #' 
 #' @return
 #' Factor with organization categories.

@@ -26,7 +26,7 @@
 #' 
 #' @references 
 #' \itemize{
-#'  \item \href{https://www.skatteverket.se/download/18.8dcbbe4142d38302d74be9/1387372677724/717B06.pdf}{Population registration in Sweden}
+#'  \item \href{https://www.skatteverket.se/download/18.8dcbbe4142d38302d74be9/1387372677650/717B06.pdf}{Population registration in Sweden, SKV 717B6}
 #'  \item \href{https://www.skatteverket.se/download/18.1e6d5f87115319ffba380001857/1285595720207/70408.pdf}{SKV 704}
 #'  \item \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}
 #'  \item \emph{Personnummer: information fran Centrala folkbokförings- och uppbördsnämnden.} (1967). Stockholm
@@ -304,15 +304,13 @@ pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
   if (length(date) == 1) {
     message("The age has been calculated at ", as.character(date), 
             ".")
-  } 
-  else if (length(date) == length(pin)){
+  } else if (length(date) == length(pin)){
     message("The age is calculated relative to the '", deparse(substitute(date)), "' date")
-  }
-  else {
+  } else {
     stop("Multiple dates used.")
   }
   
-  date <- as.Date(date)
+  date <- lubridate::ymd(date)
   if(!is.pin(pin)) pin <- as.pin(pin)
   
   all_pins <- pin
@@ -323,8 +321,8 @@ pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
   }
   pin <- all_pins[valid_diff]
   
-  diff <- lubridate::interval(pin_to_date(pin),
-                   lubridate::ymd(date))
+  pin_dates <- pin_to_date(pin)
+  diff <- lubridate::interval(pin_dates, date)
 
   timespan_lubridate <-
     switch(timespan,
@@ -334,7 +332,7 @@ pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
            "days" = lubridate::days(1))
   
   age <- as.integer(diff %/% timespan_lubridate)
-  if(any(age < 0)) warning("Negative age(es).")
+  if(any(date < pin_dates)) warning("Negative age(s).")
   
   all_age <- rep(as.integer(NA), length(all_pins))
   all_age[valid_diff] <- age
