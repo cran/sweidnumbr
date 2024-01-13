@@ -8,21 +8,52 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Mans Magnusson and Erik Bulow" />
 
-<meta name="date" content="2020-03-29" />
+<meta name="date" content="2024-01-13" />
 
 <title>sweidnumbr : Structural handling of swedish identity numbers</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -34,55 +65,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -91,13 +121,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -105,6 +142,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -118,9 +156,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -289,7 +324,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -302,151 +338,185 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<h1 class="title toc-ignore">sweidnumbr : Structural handling of swedish identity numbers</h1>
+<h1 class="title toc-ignore">sweidnumbr : Structural handling of swedish
+identity numbers</h1>
 <h4 class="author">Mans Magnusson and Erik Bulow</h4>
-<h4 class="date">2020-03-29</h4>
+<h4 class="date">2024-01-13</h4>
 
 
 
-<p>This R package provides tools to work with swedish identity numbers such as personal identity numbers (personnummer) and organizational identity numbers (organisationsnummer).</p>
+<p>This R package provides tools to work with swedish identity numbers
+such as personal identity numbers (personnummer) and organizational
+identity numbers (organisationsnummer).</p>
 <div id="table-of-contents" class="section level2">
 <h2>Table of contents</h2>
 <p><a href="#installation">Installation</a> (Installation)</p>
-<p><a href="#examplepin">Example: personal identity numbers</a> (Personal identity numbers)</p>
-<p><a href="#exampleoin">Example: organizational identity numbers</a> (Organizational identity number)</p>
-<p><a href="#licens">Licensing and Citations</a> (Licensing and Citations)</p>
+<p><a href="#examplepin">Example: personal identity numbers</a>
+(Personal identity numbers)</p>
+<p><a href="#exampleoin">Example: organizational identity numbers</a>
+(Organizational identity number)</p>
+<p><a href="#licens">Licensing and Citations</a> (Licensing and
+Citations)</p>
 <p><a href="#references">References</a> (References)</p>
 </div>
 <div id="installation" class="section level2">
 <h2><a name="installation"></a>Installation</h2>
 <p>Install the stable release version in R:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;sweidnumbr&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;sweidnumbr&quot;</span>)</span></code></pre></div>
 <p>Test the installation by loading the library:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(sweidnumbr)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(sweidnumbr)</span></code></pre></div>
 <p>We also recommend setting the UTF-8 encoding:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">Sys.setlocale</span>(<span class="dt">locale=</span><span class="st">&quot;UTF-8&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">Sys.setlocale</span>(<span class="at">locale=</span><span class="st">&quot;UTF-8&quot;</span>) </span></code></pre></div>
 </div>
 <div id="example-personal-identity-numbers" class="section level2">
 <h2><a name="examplepin"></a>Example: personal identity numbers</h2>
-<p>As a first step we need to convert personal identity numbers (pin) to the same standard format used by the Swedish tax authority.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>example_pin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;640823-3234&quot;</span>, <span class="st">&quot;6408233234&quot;</span>, <span class="st">&quot;19640823-3230&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2"></a>example_pin &lt;-<span class="st"> </span><span class="kw">as.pin</span>(example_pin)</span>
-<span id="cb4-3"><a href="#cb4-3"></a>example_pin</span></code></pre></div>
+<p>As a first step we need to convert personal identity numbers (pin) to
+the same standard format used by the Swedish tax authority.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>example_pin <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;640823-3234&quot;</span>, <span class="st">&quot;6408233234&quot;</span>, <span class="st">&quot;19640823-3230&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>example_pin <span class="ot">&lt;-</span> <span class="fu">as.pin</span>(example_pin)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>example_pin</span></code></pre></div>
 <pre><code>## [1] &quot;196408233234&quot; &quot;196408233234&quot; &quot;196408233230&quot;
 ## Personal identity number(s)</code></pre>
-<p>The next step is to test if the vector is a <code>pin</code> object. To do this we use the <code>is.pin()</code> function.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">is.pin</span>(example_pin)</span></code></pre></div>
+<p>The next step is to test if the vector is a <code>pin</code> object.
+To do this we use the <code>is.pin()</code> function.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">is.pin</span>(example_pin)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<p>This only check the format of the pin. To check the pin using the control number we use <code>pin_ctrl()</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">pin_ctrl</span>(example_pin)</span></code></pre></div>
+<p>This only check the format of the pin. To check the pin using the
+control number we use <code>pin_ctrl()</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">pin_ctrl</span>(example_pin)</span></code></pre></div>
 <pre><code>## [1]  TRUE  TRUE FALSE</code></pre>
-<p>We can now use <code>pin_birthplace()</code> and <code>pin_sex()</code>. To get information on sex and birthplace.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">pin_sex</span>(example_pin)</span></code></pre></div>
+<p>We can now use <code>pin_birthplace()</code> and
+<code>pin_sex()</code>. To get information on sex and birthplace.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">pin_sex</span>(example_pin)</span></code></pre></div>
 <pre><code>## [1] Male Male Male
 ## Levels: Male</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">pin_birthplace</span>(example_pin)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">pin_birthplace</span>(example_pin)</span></code></pre></div>
 <pre><code>## [1] Gotlands län Gotlands län Gotlands län
 ## 28 Levels: Stockholm stad Stockholms län Uppsala län ... Born after 31 december 1989</code></pre>
-<p>As the last step we can calculate the age based on the pin. We choose the date where we want to calculate the age. If date is not specified the current date is used.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">pin_age</span>(example_pin)</span></code></pre></div>
-<pre><code>## [1] 55 55 55</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">pin_age</span>(example_pin, <span class="dt">date =</span> <span class="st">&quot;2000-01-01&quot;</span>)</span></code></pre></div>
+<p>As the last step we can calculate the age based on the pin. We choose
+the date where we want to calculate the age. If date is not specified
+the current date is used.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">pin_age</span>(example_pin)</span></code></pre></div>
+<pre><code>## [1] 59 59 59</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">pin_age</span>(example_pin, <span class="at">date =</span> <span class="st">&quot;2000-01-01&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] 35 35 35</code></pre>
-<p>It is also possible to format the pin for presentation in different forms. (Note however that the output of <code>format_pin</code> is just a character and no longer a <code>pin</code> object):</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">format_pin</span>(example_pin, <span class="st">&quot;%Y-%m-%d-%N&quot;</span>)</span></code></pre></div>
+<p>It is also possible to format the pin for presentation in different
+forms. (Note however that the output of <code>format_pin</code> is just
+a character and no longer a <code>pin</code> object):</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">format_pin</span>(example_pin, <span class="st">&quot;%Y-%m-%d-%N&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;1964-08-23-3234&quot; &quot;1964-08-23-3234&quot; &quot;1964-08-23-3230&quot;</code></pre>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">format_pin</span>(example_pin, <span class="st">&quot;%P&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">format_pin</span>(example_pin, <span class="st">&quot;%P&quot;</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;(19) 64-08-23 - 3234&quot; &quot;(19) 64-08-23 - 3234&quot; &quot;(19) 64-08-23 - 3230&quot;</code></pre>
-<p>Sometimes we want some example <code>pin</code>s. We can easily simulate <code>pin</code>s using <code>rpin()</code>:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw">rpin</span>(<span class="dv">3</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;192611110961&quot; &quot;199406204404&quot; &quot;201908190725&quot;
+<p>Sometimes we want some example <code>pin</code>s. We can easily
+simulate <code>pin</code>s using <code>rpin()</code>:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">rpin</span>(<span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;194712876764&quot; &quot;202010110787&quot; &quot;192610118990&quot;
 ## Personal identity number(s)</code></pre>
 </div>
 <div id="example-organizational-identity-numbers" class="section level2">
-<h2><a name="exampleoin"></a>Example: organizational identity numbers</h2>
-<p>Handling of organizational identity numbers is done in a similar fashion. But organizational numbers are only allowed to have one format.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>example_oin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;556000-4615&quot;</span>, <span class="st">&quot;232100-0156&quot;</span>, <span class="st">&quot;802002-4280&quot;</span>)</span>
-<span id="cb24-2"><a href="#cb24-2"></a>example_oin &lt;-<span class="st"> </span><span class="kw">as.oin</span>(example_oin)</span>
-<span id="cb24-3"><a href="#cb24-3"></a>example_oin</span></code></pre></div>
+<h2><a name="exampleoin"></a>Example: organizational identity
+numbers</h2>
+<p>Handling of organizational identity numbers is done in a similar
+fashion. But organizational numbers are only allowed to have one
+format.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>example_oin <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;556000-4615&quot;</span>, <span class="st">&quot;232100-0156&quot;</span>, <span class="st">&quot;802002-4280&quot;</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>example_oin <span class="ot">&lt;-</span> <span class="fu">as.oin</span>(example_oin)</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>example_oin</span></code></pre></div>
 <pre><code>## [1] &quot;556000-4615&quot; &quot;232100-0156&quot; &quot;802002-4280&quot;
 ## Organizational identity number(s)</code></pre>
-<p>We can test if the vector has a correct format in a similar way as for <code>pin</code>.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="kw">is.oin</span>(example_oin)</span></code></pre></div>
+<p>We can test if the vector has a correct format in a similar way as
+for <code>pin</code>.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">is.oin</span>(example_oin)</span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
-<p>With a vector of <code>oin</code> we can check if the organizational number is correct.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">oin_ctrl</span>(example_oin)</span></code></pre></div>
+<p>With a vector of <code>oin</code> we can check if the organizational
+number is correct.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">oin_ctrl</span>(example_oin)</span></code></pre></div>
 <pre><code>## [1] TRUE TRUE TRUE</code></pre>
 <p>We can also check the type of organization.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="kw">oin_group</span>(example_oin)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">oin_group</span>(example_oin)</span></code></pre></div>
 <pre><code>## [1] Aktiebolag                             
 ## [2] Stat, landsting, kommuner, församlingar
 ## [3] Ideella föreningar och stiftelser      
 ## 3 Levels: Aktiebolag ... Stat, landsting, kommuner, församlingar</code></pre>
-<p>Sometimes we want some example <code>oin</code>s. We can easily simulate <code>oin</code>s using <code>roin()</code>:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="kw">roin</span>(<span class="dv">3</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;964228-2835&quot; &quot;945463-1814&quot; &quot;736937-8059&quot;
+<p>Sometimes we want some example <code>oin</code>s. We can easily
+simulate <code>oin</code>s using <code>roin()</code>:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">roin</span>(<span class="dv">3</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;358312-4031&quot; &quot;878143-3449&quot; &quot;939948-4279&quot;
 ## Organizational identity number(s)</code></pre>
 </div>
 <div id="licensing-and-citations" class="section level2">
 <h2><a name="licens"></a>Licensing and Citations</h2>
-<p>This work can be freely used, modified and distributed under the open license specified in the <a href="https://github.com/MansMeg/sweidnumbr/blob/master/DESCRIPTION">DESCRIPTION file</a>.</p>
+<p>This work can be freely used, modified and distributed under the open
+license specified in the <a href="https://github.com/rOpenGov/sweidnumbr/blob/master/DESCRIPTION">DESCRIPTION
+file</a>.</p>
 <p>Kindly cite the work as follows</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="kw">citation</span>(<span class="st">&quot;sweidnumbr&quot;</span>)</span></code></pre></div>
-<pre><code>## 
-## Kindly cite the sweidnumbr R package as follows:
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="st">&quot;sweidnumbr&quot;</span>)</span></code></pre></div>
+<pre><code>## Kindly cite the sweidnumbr R package as follows:
 ## 
-##   Magnusson, Mans and Bulow, Erik (2020). sweidnumbr: R tools to handle
-##   of swedish identity numbers. R package version 1.4.2 URL:
-##   http://github.com/rOpenGov/sweidnumbr
+##   Magnusson, Mans and Bulow, Erik (2024). sweidnumbr: R tools to handle
+##   of swedish identity numbers. R package version 1.5.0 URL:
+##   https://github.com/rOpenGov/sweidnumbr
 ## 
 ## A BibTeX entry for LaTeX users is
 ## 
 ##   @Misc{,
 ##     title = {sweidnumbr: R tools to handle of swedish identity numbers.},
 ##     author = {Mans Magnusson and Erik Bulow},
-##     url = {http://github.com/rOpenGov/sweidnumbr},
-##     year = {2020},
-##     note = {R package version 1.4.2},
+##     url = {https://github.com/rOpenGov/sweidnumbr},
+##     year = {2024},
+##     note = {R package version 1.5.0},
 ##   }</code></pre>
 </div>
 <div id="references" class="section level2">
 <h2><a name="references"></a>References</h2>
 <ul>
-<li><a href="https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv717B-4.pdf">Population registration in Sweden</a>. (2007)</li>
-<li><a href="https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv704-8.pdf">SKV 704 : Personnummer</a>. (2007)</li>
-<li><a href="http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/">SOU 2008:60 : Personnummer och samordningsnummer</a>. (2008)</li>
-<li>Personnummer: information fran Centrala folkbokförings- och uppbördsnämnden. (1967). Stockholm</li>
-<li>Den svenska folkbokföringens historia under tre sekel. (1982). Solna: Riksskatteverket <a href="http://www.skatteverket.se/privat/folkbokforing/omfolkbokforing/folkbokforingigaridag/densvenskafolkbokforingenshistoriaundertresekler.4.18e1b10334ebe8bc80004141.html">URL</a></li>
-<li><a href="http://www.riksdagen.se/sv/dokument-lagar/dokument/svensk-forfattningssamling/lag-1974174-om-identitetsbeteckning-for_sfs-1974-174">Lag (1974:174) om identitetsbeteckning for juridiska personer m.fl.</a></li>
+<li><a href="https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv717B-4.pdf">Population
+registration in Sweden</a>. (2007)</li>
+<li><a href="https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv704-8.pdf">SKV
+704 : Personnummer</a>. (2007)</li>
+<li><a href="https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/personnummer-och-samordningsnummer-del-1_gwb360/">SOU
+2008:60 : Personnummer och samordningsnummer</a>. (2008)</li>
+<li>Personnummer: information fran Centrala folkbokförings- och
+uppbördsnämnden. (1967). Stockholm</li>
+<li>Den svenska folkbokföringens historia under tre sekel. (1982).
+Solna: Riksskatteverket <a href="http://www.skatteverket.se/privat/folkbokforing/omfolkbokforing/folkbokforingigaridag/densvenskafolkbokforingenshistoriaundertresekler.4.18e1b10334ebe8bc80004141.html">URL</a></li>
+<li><a href="https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/lag-1974174-om-identitetsbeteckning-for_sfs-1974-174/">Lag
+(1974:174) om identitetsbeteckning for juridiska personer m.fl.</a></li>
 </ul>
 </div>
 <div id="session-info" class="section level2">
 <h2>Session info</h2>
 <p>This vignette was created with</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a><span class="kw">sessionInfo</span>()</span></code></pre></div>
-<pre><code>## R version 3.6.1 (2019-07-05)
-## Platform: x86_64-apple-darwin15.6.0 (64-bit)
-## Running under: macOS Catalina 10.15.3
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<pre><code>## R version 4.3.1 (2023-06-16)
+## Platform: aarch64-apple-darwin20 (64-bit)
+## Running under: macOS Sonoma 14.2.1
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
 ## 
 ## locale:
-## [1] C/sv_SE.UTF-8/sv_SE.UTF-8/C/sv_SE.UTF-8/sv_SE.UTF-8
+## [1] C/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## time zone: Europe/Stockholm
+## tzcode source: internal
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] sweidnumbr_1.4.2
+## [1] sweidnumbr_1.5.0
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.3      lubridate_1.7.4 digest_0.6.25   backports_1.1.5
-##  [5] magrittr_1.5    evaluate_0.14   rlang_0.4.5     stringi_1.4.5  
-##  [9] checkmate_2.0.0 rmarkdown_1.18  tools_3.6.1     stringr_1.4.0  
-## [13] xfun_0.11       yaml_2.2.0      compiler_3.6.1  htmltools_0.4.0
-## [17] knitr_1.26</code></pre>
+##  [1] backports_1.4.1   digest_0.6.33     R6_2.5.1          lubridate_1.9.2  
+##  [5] fastmap_1.1.1     xfun_0.40         magrittr_2.0.3    glue_1.6.2       
+##  [9] cachem_1.0.8      stringr_1.5.0     knitr_1.43        htmltools_0.5.6  
+## [13] timechange_0.2.0  generics_0.1.3    rmarkdown_2.24    lifecycle_1.0.4  
+## [17] cli_3.6.1         sass_0.4.7        jquerylib_0.1.4   compiler_4.3.1   
+## [21] rstudioapi_0.15.0 tools_4.3.1       checkmate_2.2.0   evaluate_0.21    
+## [25] bslib_0.5.1       yaml_2.3.7        rlang_1.1.2       jsonlite_1.8.7   
+## [29] stringi_1.7.12</code></pre>
 </div>
 
 

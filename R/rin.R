@@ -19,8 +19,16 @@
 #' pin_age(x)
 #' 
 #' @export
-rpin <- function(n, start_date = "1900-01-01", end_date = Sys.Date(), p.male = 0.1, p.coordn = 0.1){
+rpin <- function(n, start_date = "1900-01-01", end_date = Sys.Date(), p.male = 0.5, p.coordn = 0.1){
   if(length(n) > 1) n <- length(n)
+  checkmate::assert_int(n)
+  start_date <- as.Date(start_date)
+  end_date <- as.Date(end_date)
+  checkmate::assert_date(start_date)  
+  checkmate::assert_date(end_date)  
+  checkmate::assert_number(p.male, lower = 0, upper = 1)
+  checkmate::assert_number(p.coordn, lower = 0, upper = 1)
+  
   sd <- lubridate::ymd(start_date)
   ed <- lubridate::ymd(end_date)
   days <- as.numeric(ed - sd) + 1
@@ -35,7 +43,7 @@ rpin <- function(n, start_date = "1900-01-01", end_date = Sys.Date(), p.male = 0
   xx <- formatC(xx, width = 2, format = "d", flag = "0")
   x <- sample(x = as.character(c(0,2,4,6,8,1,3,5,7,9)), prob = c(rep(1-p.male,5), rep(p.male,5)), replace = TRUE, size = n)
   yyyymmddxxx <- paste0(yyyymmdd, xx, x)
-  c <- as.character(luhn_algo(yyyymmddxxx, c(2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2)))
+  c <- as.character(luhn_algo(yyyymmddxxx, c(0, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2)))
   as.pin(paste0(yyyymmddxxx,c))
 }
   
@@ -57,6 +65,8 @@ rpin <- function(n, start_date = "1900-01-01", end_date = Sys.Date(), p.male = 0
 #' @export
 roin <- function(n){
   if(length(n) > 1) n <- length(n)
+  checkmate::assert_int(n)
+  
   g <- sample(x = c("1", "2", "3", "5", "6", "7", "8", "9"), replace = TRUE, size = n)
   x <- sample(x = as.character(c(0:9)), replace = TRUE, size = n)
   xxxx <- floor(stats::runif(n)*8000) + 2000

@@ -13,7 +13,7 @@
 #' @param oin Vector with swedish organizational identity numbers in character format. See details.
 #' 
 #' @references 
-#' \href{http://www.riksdagen.se/sv/dokument-lagar/dokument/svensk-forfattningssamling/lag-1974174-om-identitetsbeteckning-for_sfs-1974-174}{Lag (1974:174) om identitetsbeteckning for juridiska personer m.fl.}
+#' \href{https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/lag-1974174-om-identitetsbeteckning-for_sfs-1974-174/}{Lag (1974:174) om identitetsbeteckning for juridiska personer m.fl.}
 #' 
 #' @return
 #' Character vector (of class \code{oin} and \code{AsIs}) with swedish organizational identity numbers.
@@ -100,13 +100,17 @@ as.oin.default <- function(oin){
 #' Logical vector indicating if the elements can be an organization identity number.
 #'
 #' @examples
-#' ex_oin <- c("556000-4615", "232100-0156", "802002-4280", "8020024280", "AA2002-4280")
+#' ex_oin <- roin(3)
 #' is.oin(ex_oin)
+#' 
+#' ex_oin_char <- as.character(ex_oin)
+#' is.oin(ex_oin_char)
 #' 
 #' @export
 is.oin <- function(oin){
   inherits(oin, "oin")
 }
+
 
 #' @title
 #' Check the control numbers for \code{oin}
@@ -129,6 +133,7 @@ is.oin <- function(oin){
 #' 
 #' @export
 oin_ctrl <- function(oin, force_logical = FALSE){
+  checkmate::assert_flag(force_logical)
   if(force_logical){
     if(!is.oin(oin)) oin <- suppressWarnings(as.oin(oin))
   } else {

@@ -28,7 +28,7 @@
 #' \itemize{
 #'  \item \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv717B-4.pdf}{Skatteverket, \emph{Population registration in Sweden}, SKV 717B} (2007)
 #'  \item \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv704-8.pdf}{Skatteverket, \emph{Personnummer}, SKV 704} (2007)
-#'  \item \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer} (2008)
+#'  \item \href{https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/personnummer-och-samordningsnummer-del-1_gwb360/}{SOU 2008:60 : Personnummer och samordningsnummer} (2008)
 #'  \item \emph{Personnummer: information fran Centrala folkbokförings- och uppbördsnämnden.} (1967). Stockholm
 #'  \item \emph{Den svenska folkbokföringens historia under tre sekel.} (1982). Solna: Riksskatteverket \href{http://www.skatteverket.se/privat/folkbokforing/omfolkbokforing/folkbokforingigaridag/densvenskafolkbokforingenshistoriaundertresekler.4.18e1b10334ebe8bc80004141.html}{URL}
 #' }
@@ -132,7 +132,7 @@ as.pin.character <- function(pin){
       if (i %in% 5:8) {
         msg[2] <- paste("people with birth year before 1967 and",
                         "character 'A', 'T' or 'X' instead of control number",
-                        "assumed deceast before 1967.")
+                        "assumed deceased before 1967.")
       }
     }
   }
@@ -165,6 +165,14 @@ as.pin.character <- function(pin){
 }
 
 #' @rdname as.pin
+#' 
+#' @examples
+#' ex_pin <- rpin(3)
+#' is.pin(ex_pin)
+#' 
+#' ex_pin_char <- as.character(ex_pin)
+#' is.pin(ex_pin_char)
+#' 
 #' @export
 is.pin <- function(pin) inherits(pin, "pin")
 
@@ -182,7 +190,7 @@ is.pin <- function(pin) inherits(pin, "pin")
 #' \itemize{
 #'  \item Skatteverket, \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv717B-4.pdf}{\emph{Population registration in Sweden}}. SKV 717B. (2007)
 #'  \item Skatteverket, \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv704-8.pdf}{\emph{Personnummer}}. SKV 704. (2007)
-#'  \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}, (2008)
+#'  \href{https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/personnummer-och-samordningsnummer-del-1_gwb360/}{SOU 2008:60 : Personnummer och samordningsnummer}, (2008)
 #' }
 #' 
 #' @return
@@ -203,7 +211,7 @@ pin_ctrl <- function(pin, force_logical = FALSE){
 
   res <- vapply(pin, luhn_algo, integer(1), USE.NAMES = FALSE, 
                 multiplier = c(0, 0, 2, 1, 2, 1, 2, 1, 2, 1, 2, 0))
-  old_pin_format <- format(pin_to_date(pin), format = "%Y") <= "1967" & grepl("*[ATX]$", pin)
+  old_pin_format <- format(pin_date(pin), format = "%Y") <= "1967" & grepl("*[ATX]$", pin)
   res <- as.integer(substr(pin, 12, 12)) == res | old_pin_format
   if(force_logical) res[is.na(res)] <- FALSE
   res
@@ -221,7 +229,7 @@ pin_ctrl <- function(pin, force_logical = FALSE){
 #' \itemize{
 #'  \item Skatteverket, \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv717B-4.pdf}{\emph{Population registration in Sweden}}. SKV 717B. (2007)
 #'  \item Skatteverket, \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv704-8.pdf}{\emph{Personnummer}}. SKV 704. (2007)
-#'  \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}, (2008)
+#'  \href{https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/personnummer-och-samordningsnummer-del-1_gwb360/}{SOU 2008:60 : Personnummer och samordningsnummer}, (2008)
 #' }
 #' 
 #' @return
@@ -253,7 +261,7 @@ pin_sex <- function(pin){
 #' \itemize{
 #'  \item Skatteverket, \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv717B-4.pdf}{\emph{Population registration in Sweden}}. SKV 717B. (2007)
 #'  \item Skatteverket, \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv704-8.pdf}{\emph{Personnummer}}. SKV 704. (2007)
-#'  \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}, (2008)
+#'  \href{https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/personnummer-och-samordningsnummer-del-1_gwb360/}{SOU 2008:60 : Personnummer och samordningsnummer}, (2008)
 #' }
 #' 
 #' @return
@@ -287,6 +295,7 @@ pin_coordn <- function(pin) {
 #'   \item \code{weeks}
 #'   \item \code{days}
 #' }
+#' @param verbose Should messages be printed? Default is \code{TRUE}.
 #'
 #' @references 
 #' \itemize{
@@ -308,18 +317,18 @@ pin_coordn <- function(pin) {
 #' pin_age(ex_pin, date = "2012-01-01")
 #'
 #' @export
-pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
+pin_age <- function(pin, date=Sys.Date(), timespan = "years", verbose = TRUE) {
   date <- as.Date(date)
   checkmate::assert_date(date, any.missing = FALSE)
   checkmate::assert_choice(timespan, choices = c("years", "months", "weeks", "days"))
+  checkmate::assert_flag(verbose)
   
   if (length(date) == 1) {
-    message("The age has been calculated at ", as.character(date), 
-            ".")
+    if(verbose) message("The age has been calculated at ", as.character(date), ".")
   } else if (length(date) == length(pin)){
-    message("The age is calculated relative to the '", deparse(substitute(date)), "' date")
+    if(verbose) message("The age has been calculated at based on supplied dates.")
   } else {
-    stop("Multiple dates used.")
+    stop("Incorrect length of 'date'.")
   }
   
   date <- lubridate::ymd(date)
@@ -333,7 +342,7 @@ pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
   }
   pin <- all_pins[valid_diff]
   
-  pin_dates <- pin_to_date(pin)
+  pin_dates <- pin_date(pin)
   diff <- lubridate::interval(pin_dates, date)
 
   timespan_lubridate <-
@@ -351,6 +360,30 @@ pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
   all_age
 }
 
+## pin_to_date
+#' @title Calculate the date of birth from a \code{pin}
+#' @description Calculates the date of birth in date format.
+#' @param pin Swedish ID number
+#' @return Date of birth as a vector in date format.
+#' 
+#' @name pin_to_date-deprecated
+#' @usage pin_to_date(pin)
+#' @seealso \code{\link{sweidnumbr-deprecated}}
+#' @keywords internal
+NULL
+
+#' @rdname sweidnumbr-deprecated
+#' @section \code{pin_to_date}:
+#' For \code{pin_to_date}, use \code{\link{pin_date}}.
+#' 
+#' @export
+pin_to_date <- function(pin) {
+  .Deprecated(new = "pin_date", package = "sweidnumbr")
+  if(!is.pin(pin)) pin <- as.pin(pin)
+  pin <- pin_coordn_correct(pin)
+  lubridate::ymd(substr(pin,1,8))
+}
+
 
 #' @title
 #' Calculate the date of birth from a \code{pin}
@@ -366,10 +399,10 @@ pin_age <- function(pin, date=Sys.Date(), timespan = "years") {
 #' @examples
 #' # Examples taken from SKV 704 (see references)
 #' ex_pin <- c("196408233234", "186408833224")
-#' pin_to_date(ex_pin)
+#' pin_date(ex_pin)
 #' 
 #' @export
-pin_to_date <- function(pin) {
+pin_date <- function(pin) {
   if(!is.pin(pin)) pin <- as.pin(pin)
   pin <- pin_coordn_correct(pin)
   lubridate::ymd(substr(pin,1,8))
@@ -399,7 +432,7 @@ pin_to_date <- function(pin) {
 #' @inheritParams pin_ctrl
 #' 
 #' @references
-#' \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer}
+#' \href{https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/personnummer-och-samordningsnummer-del-1_gwb360/}{SOU 2008:60 : Personnummer och samordningsnummer}
 #' 
 #' @return
 #' Birthplace as factor.

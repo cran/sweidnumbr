@@ -52,12 +52,18 @@ ex_pin5 <-c("205012090122", "186512090122", "121209-0122", "121209-012A")
 as.pin(pin = ex_pin5)
 pin <-c("201212090122", "201212090122", "121209-0122", "1212090122")
 
+ex_pin <- rpin(3)
+is.pin(ex_pin)
+
+ex_pin_char <- as.character(ex_pin)
+is.pin(ex_pin_char)
+
 }
 \references{
 \itemize{
  \item \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv717B-4.pdf}{Skatteverket, \emph{Population registration in Sweden}, SKV 717B} (2007)
  \item \href{https://github.com/rOpenGov/sweidnumbr/blob/master/docs/skv704-8.pdf}{Skatteverket, \emph{Personnummer}, SKV 704} (2007)
- \item \href{http://www.riksdagen.se/sv/Dokument-Lagar/Utredningar/Statens-offentliga-utredningar/Personnummer-och-samordningsnu_GWB360/}{SOU 2008:60 : Personnummer och samordningsnummer} (2008)
+ \item \href{https://www.riksdagen.se/sv/dokument-och-lagar/dokument/statens-offentliga-utredningar/personnummer-och-samordningsnummer-del-1_gwb360/}{SOU 2008:60 : Personnummer och samordningsnummer} (2008)
  \item \emph{Personnummer: information fran Centrala folkbokförings- och uppbördsnämnden.} (1967). Stockholm
  \item \emph{Den svenska folkbokföringens historia under tre sekel.} (1982). Solna: Riksskatteverket \href{http://www.skatteverket.se/privat/folkbokforing/omfolkbokforing/folkbokforingigaridag/densvenskafolkbokforingenshistoriaundertresekler.4.18e1b10334ebe8bc80004141.html}{URL}
 }
